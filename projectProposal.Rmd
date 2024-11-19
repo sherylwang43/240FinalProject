@@ -45,9 +45,13 @@ In order to communicate with each other, we plan to use our .wisc emails and an 
 We also created a github repository with each group member having collaborator access so that we can edit our R Markdown and HTML files seperately;
 this means that it is less necessary to schedule physical meet ups which is difficult with everyone's schedules. 
 
+In order to ensure that we maintain high quality code without in-person meetings we can Code Review by: 
+ - Each team member reviewing another's code
+   - Documentation of reviewing findings
+  
+
 ## Question of Interest
-On average was the mean age of survivors on the Titanic younger or older? 
-Did age affect survival chances on the Titanic?
+What is the relationship between passenger age and survival probability on the Titanic, and can we use this relationship to predict survival chances for passengers of different ages? 
 
 
 ## Data
