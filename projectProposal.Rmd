@@ -46,7 +46,9 @@ We also created a github repository with each group member having collaborator a
 this means that it is less necessary to schedule physical meet ups which is difficult with everyone's schedules. 
 
 ## Question of Interest
-[Question of Interest here] sdfdsff sffdggdfgddfg 
+On average was the average age of survivors on the titanic younger or older? 
+Did age affect survival chances on the titanic?
+
 
 ## Data
 Link to data: https://github.com/awesomedata/awesome-public-datasets/tree/master/Datasets
