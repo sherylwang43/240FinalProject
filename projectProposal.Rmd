@@ -1,0 +1,27 @@
+---
+title: "Project Proposal"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Project Members & Communication
+Sheryl Wang, Luke Morrison, Camden Cobb, Cameron Marique
+
+In order to communicate with each other, we plan to: 
+
+## Question of Interest
+[Question of Interest here]
+
+## Data
+Link to data: https://github.com/awesomedata/awesome-public-datasets/tree/master/Datasets
+
+Description of data:
+
+## Graph/Visualization
+[Description of graph here]
+
+## Inference method
+[Descriptin of inference method here]
