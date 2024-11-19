@@ -41,12 +41,12 @@ Inference on a single population mean (is it equal to some value of interest?) o
 ## Project Members & Communication
 Sheryl Wang, Luke Morrison, Camden Cobb, Cameron Maricque
 
-In order to communicate with each other, we plan to use our .wisc emails and an Outlook group to communicate asynchonously about project details. 
+In order to communicate with each other, we plan to use our .wisc emails and an Outlook group to communicate asynchronously about project details. 
 We also created a github repository with each group member having collaborator access so that we can edit our R Markdown and HTML files seperately;
 this means that it is less necessary to schedule physical meet ups which is difficult with everyone's schedules. 
 
 ## Question of Interest
-On average was the average age of survivors on the titanic younger or older? 
+On average was the mean age of survivors on the titanic younger or older? 
 Did age affect survival chances on the titanic?
 
 
