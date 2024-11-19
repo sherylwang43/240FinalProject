@@ -54,9 +54,47 @@ Did age affect survival chances on the Titanic?
 Link to data: https://github.com/awesomedata/awesome-public-datasets/tree/master/Datasets
 
 Description of data:
+Data Collection and Source:
+   The Titanic dataset was compiled from historical passengers and official records of the RMS Titanic's maiden voyage in 1912. The primary source materials are: 
+1. Official passenger manifests 
+2. Encyclopedia Titanica 
+3. Survival records from the disaster 
+4. Ticket purchasing recrods and boarding documents 
+
+Unit Of Observation:
+Each Row in the dataset represents one individual passenger aboard the Titanic's maiden voyage. 
+
+Population:
+The dataset represents the complete population of all documented passengers aboard the Titanic (not just a sample) 
+
+What are Our Key Variables: 
+1. Age: 
+Continous numerical variable, measured by passenger's age in years. 
+Missing values present: yes 
+
+2. Survived 
+Type: Binary categorical variable
+Bernoulli: 0 = did not survive 1 = Survived 
+No missing values for this 
+This is our dependent variable
 
 ## Graph/Visualization
-[Description of graph here]
+Primary Visualization:
+We will create a Scatter Plot with our x-axis as age (0-80) and Y axis (0 or 1) We can also create an age distribution subplot to make a histogram fora age distribution with seperate colors for survivors and non-survivors to help enhance visualizing age-related survival patterns. 
+We could add vertical reference lines for meaninful age boundaries (18 for children, 65 for seniors) 
+In order to make the experiment more complex, we could add a Prediction interval with a light red shade which would show the 95% prediction interval 
+
 
 ## Inference method
-[Descriptin of inference method here]
+Our inference method will be: Linear Regression.
+Independent (X): Age (continuous)
+Dependent (Y): Survival status (binary: 0/1)
+
+Justification:
+1. While our dependent variable is binary, we belive linear regression can still provide meaningful insights about probability of survival.
+2. Age being continuous as our predictor makes linear regression appropriate. 
+3. The coefficients will give a clear sign as change in survival probability per year of age. 
+
+We will supplement our Linear Regression with a prediction interval at 95% 
+
+
