@@ -6,37 +6,7 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-The knitted .html file should contain:
 
-The names of the students in the group.
-
-A brief description of how the group will communicate and work together.
-When during the week can the group meet? Consider needs of all group members.
-What platforms will the group use to communicate and share documents?
-
-The question or questions of interest that motivate the planned study.
-The topic selected must be unanimous among group members.
-See "Question of Interest" above.
-
-Links to where one can find and download the dataset(s) you are going to use. Please confirm that you can read the data into RStudio. 
-
-A description of the data:
-Who collected the data? 
-How were the data collected? (Note: Just stating that "you found the dataset on Kaggle" or similar is not enough. If the dataset does not document how it was collected, you should either change to a new dataset, or describe important questions you have about the collection process which remain unanswered.) 
-What are the key variables in the data set, what do they measure, and how are they related to your key questions? (You do not have to describe variables which you will not use for your question of interest.)
-What does a single row of the data set represent in real terms? (E.g. One row of the dataset represents one winter season where Lake Monona froze over.)
-If the data is a sample from some larger population, what is that larger population?
- 
-
-Include a description of a graph which will show how the data informs the primary question of interest.
-Describe what variables you will include and what type of graph you will create.
-You do not have to create the graph just yet, only a description is required.
- 
-
-Finally, please do your best to identify which type of inference method you are going to use. In particular, please identify one of the inference methods listed below, and which variable(s) are your cause and effect (if applicable)
-Simple linear regression (Using a continuous variable X to predict a continuous variable Y)
-Inference on a single population proportion (is it equal to some value of interest?) or difference of two population proportions
-Inference on a single population mean (is it equal to some value of interest?) or difference of two population means 
 
 ## Project Members & Communication
 Sheryl Wang, Luke Morrison, Camden Cobb, Cameron Maricque
