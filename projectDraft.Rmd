@@ -5,25 +5,84 @@ date: "2024-11-19"
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, 
+                      error = TRUE, 
+                      warning = FALSE, 
+                      message = FALSE)
+library(tidyverse)
 ```
 
-## R Markdown
+## Introduction
+The Titanic is one of history’s most well-known shipwrecks, and the stories of its passengers still capture attention over a hundred years later. The circumstances surrounding who survived and who did not have sparked countless questions and theories. Were children given priority during the evacuation? Did certain age groups have a better chance of survival? 
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+In this analysis, we aim to answer the question: What is the relationship between passenger age and survival probability on the Titanic, and can we use this relationship to predict survival chances for passengers of different ages? Our dataset uses many different resources such as survival records, ticketing records, official passenger records, and Encyclopedia Titanica to provide us with the passengers survival outcomes and demographic details, we will be taking a closer look at the ages of the passengers to uncover patterns and insights into how survival was affected by this demographic. 
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+Our analysis provides evidence that age is in fact associated with survival probability, suggesting that younger passengers were more likely to survive than older ones.
 
-```{r cars}
-summary(cars)
-```
+## Background
 
-## Including Plots
+During the maiden voyage of the RMS Titanic in 1912, the ship hit an iceberg and sunk, leading to one of the most prolific shipwrecks in history. Because of the Titanic’s historical importance, plenty of data exists about every passenger on this voyage, including data about passengers’ age and their survival status. 
 
-You can also embed plots, for example:
+In order to investigate whether these two variables are related, we found a Titanic dataset on github^[https://github.com/awesomedata/awesome-public-datasets/tree/master/Datasets] (see resources at bottom). The data in this set was compiled from historical passengers and official records of the RMS Titanic's maiden voyage in 1912, using official passenger manifests, Encyclopedia Titanica, survival records from the disaster, and ticket purchasing records and boarding documents to gather historically accurate data.
 
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
+A single row in the Titanic dataset represents one individual passenger aboard the Titanic’s maiden voyage. We had two variables of interest. 
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+Our first variable of interest was a passenger’s age. This was a numerical variable measured by age in years, and our dataset did contain missing values for this variable. This variable was our independent variable and served as the x-axis for our graphical representation.
+
+Our second variable of interest was whether a passenger survived or not. This was a binary, categorical variable with 0 representing a non-surviving passenger and 1 representing a surviving passenger. There were no missing values for this variable. This was our dependent variable. 
+
+## Analysis
+
+This study employed a simple linear regression model to explore the relationship between passengers’ age and their probability of survival aboard the Titanic. The parameter of interest is the slope coefficient $\beta_1$, which quantifies the expected change in survival probability for each additional year of age. 
+
+The regression model is given by: 
+$$Y_i = \beta_0 + \beta_1X_i + \epsilon_i$$ 
+where: 
+
+$Y_i$ represents the survival outcome of the ith passenger (coded as $1$ for “Survived” and $0$ for “Did Not Survive”),
+
+$X_i$, is the age of the ith passenger, 
+
+$\beta_0$, is the intercept term, 
+
+$\beta_1$, is the slope coefficient,
+
+$\epsilon_i$, which is the error term, and in this case is assumed to be independently and identically distributed with mean zero and constant variance $\sigma^2$
+
+To determine whether age is significantly associated with survival probability, we conducted a hypothesis test on $\beta_1$ using ordinary least squares (OLS) estimation: 
+where: 
+Null Hypothesis ($H_0$) $\beta_1 = 0$ (There is no linear relationship between age and survival probability.) 
+Alternative Hypothesis ($H_a$) $\beta_1 \neq 0$ (There is a linear relationship between age and survival probability.)
+The estimated regression equation from our OLS analysis is: 
+$\hat{Y} = 0.483753 - 0.002613X_i$. 
+The slope coefficient $\hat{β_1} = -0.002613$ has a standard error of $0.001264$, yielding a t-statistic of $-2.067$. The associated p-value is $0.0391$, indicating the probability of observing such an estimate under the null hypothesis. 
+
+### Assumption Checks:
+- **Linearity:** The model is assuming that there is a linear relationship between age and survival probability. A scatter plot with the fitted regression line suggested an approximate linear trend, supporting this assumption. 
+
+- **Independence of Errors:** Each passenger’s survival is assumed to be independent of others. Given the individual ‘fight for your life’ nature of a survival event like the Titanic, we believe this assumption to be reasonable. 
+
+- **Homoscedasticity:** The constant variance of residuals across all levels of age was assessed using a residuals versus fitted values plot. The plot for the most part did not display systematic patterns or heteroscedasticity suggesting that this assumption holds. 
+
+- **Normality of errors:** There were minor deviations observed at the tails (in particular, the right tail end of the plot, suggesting old age could have an usual effect on survival chances), indicating slight deviations from normality. However, the large sample size mitigates concerns regarding this violation due to the Central Limit Theorem. 
+
+- **Absence of Multicollinearity:** Since we only used one predictor variable (age), multicollinearity is not of concern for this context. 
+
+### Statistical Inference: 
+The t-test for the slope coefficient resulted in a p-value of $0.0391$, which is below the conventional significance level of $\alpha = 0.05$. We can reject the Null Hypothesis and conclude that there is a statistically significant linear relationship between age and survival probability. 
+
+
+## Discussion
+### Further Interpretation
+As shown in the analysis presented, we have enough evidence to suggest that age plays a role in survivorship after the sinking of the Titanic. 
+
+### Short-Comings and Future Work
+Short-comings
+- Gender alongside social class played a role in who was prioritized
+- Some individual’s ages weren’t accounted for in the dataset which could lead to inaccuracies
+
+### Conclusion
+The circumstances surrounding the survival of members of the Titanic sinking
+
+## Resources
+
