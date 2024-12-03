@@ -5,11 +5,21 @@ date: "2024-11-19"
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, 
-                      error = TRUE, 
+knitr::opts_chunk$set(echo = FALSE, 
+                      error = FALSE, 
                       warning = FALSE, 
                       message = FALSE)
+
+
+source("~/STAT240/scripts/ggprob.R")
+
+library(ggplot2)
+library(dplyr)
 library(tidyverse)
+library(scales)
+library(readr)
+library(ggthemes)
+
 ```
 
 ## Introduction
@@ -70,6 +80,153 @@ The slope coefficient $\hat{β_1} = -0.002613$ has a standard error of $0.001264
 
 ### Statistical Inference: 
 The t-test for the slope coefficient resulted in a p-value of $0.0391$, which is below the conventional significance level of $\alpha = 0.05$. We can reject the Null Hypothesis and conclude that there is a statistically significant linear relationship between age and survival probability. 
+
+```{r, include=FALSE}
+data <- read_csv("~/STAT240/data/titanic.csv/titanic.csv")
+head(data)
+
+# Clearing out missing Age values.
+data_clean = data %>% 
+  select(Age, Survived) %>% 
+  filter(!is.na(Age))
+
+# Modifying survived to binary notation 
+data_clean$Survived = factor(data_clean$Survived, levels = c(0,1),
+                             labels = c("Did Not Survive", "Survived"))
+data_clean$Survived_numeric = as.numeric(data_clean$Survived) - 1 
+# numerical analysis 
+model = lm(Survived_numeric ~ Age, data = data_clean)
+
+model_summary = summary(model)
+model_summary
+
+# coefficients and p - values 
+coefficients = model_summary$coefficients
+coefficients
+
+# for code reviewer: here is how I interpreted the results: 
+# Intercept 0.48, the probability of survival when the age is zero.
+# Age -0.00261, the probability of survival goes down by 2.6% by each year. 
+# P-value for age is 0.03912 which is less than statistically conventional level of 0.05, meaning we could say that there is evidence to conclude that age is associated with survival probability
+
+# how we could put this: The linear regression equation yield is: 
+# Predicted Survival Probability = 0.48375 - 0.00261 x Age
+# The coefficient for age is negative and statistically significant (p = 0.039), indicating that as age increases, the probability of survival decreases. Specifically, each additional year of age is associated with a 0.26% decrease in survival probability. This suggest that younger passengers had a higher chance of survival on the Titanic. 
+# The intercept represents the estimated survival probability at age zero. While statistically significant, this value doesn't really matter that much to us in this context, as there were very few passengers of that exact age, and our primary interest lies in the effect of age across the whole human lifespan. 
+
+# we could reject the null hypothesis that age has no effect on survival probability.
+
+# I am making a plot with Data Points. Linear Regression Line, and Prediction Interval.
+# some things to note for code reviewer: the bar code looking things are nice looking colors I found online. the v-line is denoting adult age. A prediction interval is added 
+# feel free to play around with colors or visuals, whatever you think looks best. 
+
+# basically I am going to generating predictions using sequences thats based off our fitted linear regression model. This will predict the survival probabilities at these ages. This is going to help create a smoother prediction interval. These predictions are based on our model, and I am not extrapolating beyond the scope of the analysis. This is basically to make our plot more beautiful. 
+
+# Generate predictions using data_clean
+age_seq <- seq(0, 100, by = 0.1)
+newdata <- data.frame(Age = age_seq)
+
+# Getting predictions and intervals
+predictions <- predict(model, newdata, interval = "prediction", level = 0.95)
+pred_df <- data.frame(
+  Age = age_seq,
+  fit = predictions[,"fit"],
+  lwr = predictions[,"lwr"],
+  upr = predictions[,"upr"]
+)
+
+# Now creating the plot! 
+combined = ggplot(data_clean, aes(x = Age, y = Survived_numeric)) +
+ 
+ 
+  geom_jitter(width = 0, height = 0.05, alpha = 0.3, color = "#4A90E2") +
+  
+ 
+  geom_line(data = pred_df, aes(y = fit), color = "#E74C3C", size = 1) +
+  
+ 
+  geom_ribbon(data = pred_df, aes(y = fit, ymin = lwr, ymax = upr), 
+              alpha = 0.2, fill = "#E74C3C") +
+  
+  
+  geom_vline(xintercept = c(18,65), linetype = "dashed", color = "#2ECC71", alpha = 0.75) +
+  
+ 
+  theme_minimal() +
+  labs(
+    title = "Titanic Survival Probability vs Age",
+    subtitle = "With Linear Regression and 95% Prediction Interval",
+    x = "Age (Years)",
+    y = "Probability of Survival",
+    caption = "Vertical lines: Age of adulthood (18 years) and retirement (65 years)"
+  ) +
+  
+  
+  scale_y_continuous(labels = percent) +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+    plot.subtitle = element_text(hjust = 0.5, size = 12),
+    axis.title = element_text(size = 11),
+    plot.caption = element_text(hjust = 0, size = 10, color = "gray50")
+  )
+print(combined)
+
+data_clean$fitted_values = fitted(model)
+data_clean$residuals = resid(model)
+
+
+residuals_df = data.frame(
+  Fitted = fitted(model),
+  Residuals = resid(model),
+  Age = data_clean$Age
+)
+residual_plot = ggplot(residuals_df, aes(x = Fitted, y = Residuals)) +
+  
+
+  geom_point(alpha = 0.4, color = "#3498DB") +
+  
+  
+  geom_hline(yintercept = 0, linetype = "dashed", color = "#E74C3C", size = 1) +
+  
+
+  geom_smooth(method = "loess", se = FALSE, color = "#2ECC71", size = 1) +
+  
+  
+  theme_minimal(base_size = 14) +
+  
+
+  labs(
+    title = "Residuals vs Fitted Values",
+    subtitle = "Assessing Homoscedasticity and Linearity Assumptions",
+    x = "Fitted Values (Predicted Survival Probability)",
+    y = "Residuals",
+    caption = "Data Source: Titanic Dataset"
+  ) +
+  
+  
+  scale_x_continuous(labels = percent_format(accuracy = 1)) +
+  scale_y_continuous(labels = NULL) +  
+  
+
+  theme(
+    plot.title = element_text(face = "bold", hjust = 0.5, size = 16),
+    plot.subtitle = element_text(hjust = 0.5, size = 12, color = "gray40"),
+    axis.title = element_text(face = "bold"),
+    plot.caption = element_text(hjust = 0, size = 10, color = "gray50"),
+    panel.grid.major = element_line(color = "gray80"),
+    panel.grid.minor = element_blank()
+  )
+
+
+print(residual_plot)
+
+
+```
+
+```{r}
+print(combined)
+print(residual_plot)
+```
 
 
 ## Discussion
