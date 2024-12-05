@@ -1,7 +1,7 @@
 ---
-title: "projectDraft"
+title: "Final Project Draft"
 output: html_document
-date: "2024-11-19"
+date: "December 4, 2024"
 ---
 
 ```{r setup, include=FALSE}
@@ -21,225 +21,209 @@ library(readr)
 library(ggthemes)
 
 ```
+*Authors: Luke Morrison, Camden Cobb, Cameron Marique, Sheryl Wang*
 
 ## Introduction
-The Titanic is one of history’s most well-known shipwrecks, and the stories of its passengers still capture attention over a hundred years later. The circumstances surrounding who survived and who did not have sparked countless questions and theories. Were children given priority during the evacuation? Did certain age groups have a better chance of survival? 
+The sinking of the RMS Titanic stands as one of the most profound maritime tragedies in history, its narrative woven into the fabric of our culture's memory even after more than a century. The harrowing tales of its passengers-marked by courage, sacrifice, and the stark destiny of fate, continue to captivate and mystify. The circumstances surrounding who survived and who did not have sparked countless questions and theories. Were children given priority during the evacuation? Did certain age groups have a better chance of survival? 
 
-In this analysis, we aim to answer the question: What is the relationship between passenger age and survival probability on the Titanic, and can we use this relationship to predict survival chances for passengers of different ages? Our dataset uses many different resources such as survival records, ticketing records, official passenger records, and Encyclopedia Titanica to provide us with the passengers survival outcomes and demographic details, we will be taking a closer look at the ages of the passengers to uncover patterns and insights into how survival was affected by this demographic. 
+In this analysis, we aim to answer the question: What is the relationship between passenger age and survival probability on the Titanic, and is there a statistically significant difference in the mean ages of survivors and non-survivors? Our dataset uses many different resources such as survival records, ticketing records, official passenger records, and Encyclopedia Titanica to provide us with the passenger's survival outcomes and demographic details, we will be taking a closer look at the ages of the passengers to uncover patterns and insights into how survival was affected by this demographic. Our findings provided compelling evidence that age was indeed a critical factor associated with survival probability. 
 
-Our analysis provides evidence that age is in fact associated with survival probability, suggesting that younger passengers were more likely to survive than older ones.
+Through deep analysis, we demonstrate that passengers who survived the Titanic were notably younger than those who did not survive, with an average age difference of about two years. This age difference suggests that younger passengers had better odds of survival during this historic maritime disaster.  
+
 
 ## Background
 
-During the maiden voyage of the RMS Titanic in 1912, the ship hit an iceberg and sunk, leading to one of the most prolific shipwrecks in history. Because of the Titanic’s historical importance, plenty of data exists about every passenger on this voyage, including data about passengers’ age and their survival status. 
+During the maiden voyage of the RMS Titanic in 1912, the ship hit an iceberg and sank, leading to one of the most prolific shipwrecks in history. Because of the Titanic’s historical importance, plenty of data exists about every passenger on this voyage, including data about passengers’ age and their survival status. 
 
-In order to investigate whether these two variables are related, we found a Titanic dataset on github^[https://github.com/awesomedata/awesome-public-datasets/tree/master/Datasets] (see resources at bottom). The data in this set was compiled from historical passengers and official records of the RMS Titanic's maiden voyage in 1912, using official passenger manifests, Encyclopedia Titanica, survival records from the disaster, and ticket purchasing records and boarding documents to gather historically accurate data.
+In order to investigate whether these two variables are related, we utilized a Titanic dataset on github^[https://github.com/awesomedata/awesome-public-datasets/tree/master/Datasets]. The data in this set was compiled from historical passengers and official records of the RMS Titanic's maiden voyage in 1912. This was done by using official passenger manifests, Encyclopedia Titanica, survival records from the disaster, ticket purchasing records, and boarding documents to gather historically accurate data.
 
 A single row in the Titanic dataset represents one individual passenger aboard the Titanic’s maiden voyage. We had two variables of interest. 
 
-Our first variable of interest was a passenger’s age. This was a numerical variable measured by age in years, and our dataset did contain missing values for this variable. This variable was our independent variable and served as the x-axis for our graphical representation.
+Our first variable of interest was a passenger’s age. This was a numerical variable measured by age in years, and our dataset did contain missing values for this variable. We excluded rows that had missing values. This variable was our independent variable.
 
 Our second variable of interest was whether a passenger survived or not. This was a binary, categorical variable with 0 representing a non-surviving passenger and 1 representing a surviving passenger. There were no missing values for this variable. This was our dependent variable. 
 
+To help understand our findings, we created two key visualizations. The first visualization compares the ages between those who survived and those who did not. In this boxplot visualization, each gray dot represents an individual passenger, giving us a complete picture of every age in our dataset. The boxes show where most ages fall for each group - blue for survivors and red for non-survivors. The white diamond in each box marks the average age for that group. Looking at the visualization, we can see that while the difference isn’t dramatic, the survivors’ box and collection of dots sits slightly lower than the non-survivors, showing the tendency for younger passengers to have survived more often. 
+
+Our second visualization shows what statisticians call a t-distribution curve, which helps us understand how meaningful our age difference finding is. Think of it like the famous ‘bell curve’ where the red shaded area represents all possible age differences as extreme or more extreme than what we found in our data. This type of visualization helps us understand whether the age difference we observed could have happened by chance. 
+
 ## Analysis
 
-This study employed a simple linear regression model to explore the relationship between passengers’ age and their probability of survival aboard the Titanic. The parameter of interest is the slope coefficient $\beta_1$, which quantifies the expected change in survival probability for each additional year of age. 
+### Model Statement
 
-The regression model is given by: 
-$$Y_i = \beta_0 + \beta_1X_i + \epsilon_i$$ 
-where: 
+Let $X_i$, for $i = 1,...,n_1$ represent the ages of passengers who did not survive the Titanic disaster.
 
-$Y_i$ represents the survival outcome of the ith passenger (coded as $1$ for “Survived” and $0$ for “Did Not Survive”),
+Let $Y_i$ for $i = 1,...,n_2$ represent the ages of passengers who survived the Titanic disaster. 
 
-$X_i$, is the age of the ith passenger, 
+Let $\mu_x$ and $\sigma_x$ be the true mean and standard deviation of the age of the nonsurviving group. 
 
-$\beta_0$, is the intercept term, 
+Let $\mu_y$ and $\sigma_y$ be the true mean and standard deviation of the age of the suriving group. 
 
-$\beta_1$, is the slope coefficient,
+$X_i \sim D_x(\mu_x, \sigma_x)$
 
-$\epsilon_i$, which is the error term, and in this case is assumed to be independently and identically distributed with mean zero and constant variance $\sigma^2$
+$Y_i \sim D_y(\mu_y, \sigma_y)$
 
-To determine whether age is significantly associated with survival probability, we conducted a hypothesis test on $\beta_1$ using ordinary least squares (OLS) estimation: 
-where: 
-Null Hypothesis ($H_0$) $\beta_1 = 0$ (There is no linear relationship between age and survival probability.) 
-Alternative Hypothesis ($H_a$) $\beta_1 \neq 0$ (There is a linear relationship between age and survival probability.)
-The estimated regression equation from our OLS analysis is: 
-$\hat{Y} = 0.483753 - 0.002613X_i$. 
-The slope coefficient $\hat{β_1} = -0.002613$ has a standard error of $0.001264$, yielding a t-statistic of $-2.067$. The associated p-value is $0.0391$, indicating the probability of observing such an estimate under the null hypothesis. 
+### Hypotheses
 
-### Assumption Checks:
-- **Linearity:** The model is assuming that there is a linear relationship between age and survival probability. A scatter plot with the fitted regression line suggested an approximate linear trend, supporting this assumption. 
+**Null Hypothesis** ($H_0$): There is no difference in the mean ages of survivors and non-survivors, or:
 
-- **Independence of Errors:** Each passenger’s survival is assumed to be independent of others. Given the individual ‘fight for your life’ nature of a survival event like the Titanic, we believe this assumption to be reasonable. 
+$H_0: \mu_x - \mu_y = 0$
 
-- **Homoscedasticity:** The constant variance of residuals across all levels of age was assessed using a residuals versus fitted values plot. The plot for the most part did not display systematic patterns or heteroscedasticity suggesting that this assumption holds. 
+**Alternative Hypothesis** ($H_A$): There is a difference in the mean ages of survivors and non-survivors, or:
 
-- **Normality of errors:** There were minor deviations observed at the tails (in particular, the right tail end of the plot, suggesting old age could have an usual effect on survival chances), indicating slight deviations from normality. However, the large sample size mitigates concerns regarding this violation due to the Central Limit Theorem. 
+$H_A: \mu_x - \mu_y \neq 0$
 
-- **Absence of Multicollinearity:** Since we only used one predictor variable (age), multicollinearity is not of concern for this context. 
+### Parameters of Interest 
 
-### Statistical Inference: 
-The t-test for the slope coefficient resulted in a p-value of $0.0391$, which is below the conventional significance level of $\alpha = 0.05$. We can reject the Null Hypothesis and conclude that there is a statistically significant linear relationship between age and survival probability. 
+The primary parameter of interest in this analysis is the mean age of two distinct groups: survivors and non-survivors of the Titanic disaster. Specifically, the analysis aims to compare the mean ages between these groups to determine if a statistically significant difference exists.
+
+### Test Statistic and Null Distribution
+We employ the two sample Welch’s t-test to evaluate the difference in mean ages between the two groups. Welch’s t-test is chosen because it does not assume equal variances between the groups, making it more robust, especially when sample sizes or variances differ. 
+
+The test statistic is calculated as: 
+
+$$ t = \frac{(\bar{x} - \bar{y}) - (\mu_x - \mu_y)}{SE(\bar{x}-\bar{y})}$$
+
+Under the null hypothesis $H_0: \mu_x - \mu_y = 0$ the test statistic follows a t-distribution with degree of freedom approximated by Welch’s formula.
+
+### Results
+
+We conducted a two-sample Welch’s t-test to compare the mean ages between survivors and non-survivors
+
+
+**T-Test Results:**
+
+- **t-statistic:** 2.046
+- **Degrees of Freedom:** 598.84
+- **p-value:** 0.04119
+- **Sample Estimates:**
+
+  - Mean Age (Did Not Survive): 30.626 years
+  - Mean Age (Survived): 28.344 years
+  
+  
+### P-Value
+
+The p-value obtained from the Welch’s two-sample t-test is $0.04119$. The p-value represents the probability of observing a test statistic as extreme as, or more extreme than, the one calculated ($t = 2.046$) under the assumption that the null hypothesis ($H_0$) is true. In this context, a p-value of $0.04119$ indicates that there is a $4.119\%$ probability of obtaining the observed difference in mean ages, or one more extreme, solely due to random sampling variability if there were actually no difference in the population means. 
+
+Given that the p-value of $0.04119$ is less than the significance level of $\alpha = 0.05$, it indicates that there is sufficient evidence to reject the null hypothesis. This suggests that the observed difference in mean ages between survivors and non-survivors is unlikely to have occurred by random chance alone, assuming the null hypothesis is true.
+
 
 ```{r, include=FALSE}
 data <- read_csv("~/STAT240/data/titanic.csv/titanic.csv")
-head(data)
+# Here is my data prep!
 
-# Clearing out missing Age values.
 data_clean = data %>% 
   select(Age, Survived) %>% 
-  filter(!is.na(Age))
+  filter(!is.na(Age)) %>%
+  mutate(Survived = factor(Survived, 
+                           levels = c(0, 1),
+                           labels = c("Did Not Survive", "Survived")))
 
-# Modifying survived to binary notation 
-data_clean$Survived = factor(data_clean$Survived, levels = c(0,1),
-                             labels = c("Did Not Survive", "Survived"))
-data_clean$Survived_numeric = as.numeric(data_clean$Survived) - 1 
-# numerical analysis 
-model = lm(Survived_numeric ~ Age, data = data_clean)
+# Summary statistics with things like quartile and whatnot 
+summary_stats = data_clean %>%
+  group_by(Survived) %>%
+  summarise(
+    n = n(),
+    mean_age = mean(Age),
+    sd_age = sd(Age),
+    median_age = median(Age),
+    q1 = quantile(Age, 0.25),
+    q3 = quantile(Age, 0.75)
+  )
 
-model_summary = summary(model)
-model_summary
+print(summary_stats)
 
-# coefficients and p - values 
-coefficients = model_summary$coefficients
-coefficients
+# Two-Sample T-Test
+t_test_result = t.test(Age ~ Survived, data = data_clean, var.equal = FALSE) # var.equal = FALSE is what makes this a welch’s t-test, we are assuming that equal variance is violated. 
+print(t_test_result)
 
-# for code reviewer: here is how I interpreted the results: 
-# Intercept 0.48, the probability of survival when the age is zero.
-# Age -0.00261, the probability of survival goes down by 2.6% by each year. 
-# P-value for age is 0.03912 which is less than statistically conventional level of 0.05, meaning we could say that there is evidence to conclude that age is associated with survival probability
-
-# how we could put this: The linear regression equation yield is: 
-# Predicted Survival Probability = 0.48375 - 0.00261 x Age
-# The coefficient for age is negative and statistically significant (p = 0.039), indicating that as age increases, the probability of survival decreases. Specifically, each additional year of age is associated with a 0.26% decrease in survival probability. This suggest that younger passengers had a higher chance of survival on the Titanic. 
-# The intercept represents the estimated survival probability at age zero. While statistically significant, this value doesn't really matter that much to us in this context, as there were very few passengers of that exact age, and our primary interest lies in the effect of age across the whole human lifespan. 
-
-# we could reject the null hypothesis that age has no effect on survival probability.
-
-# I am making a plot with Data Points. Linear Regression Line, and Prediction Interval.
-# some things to note for code reviewer: the bar code looking things are nice looking colors I found online. the v-line is denoting adult age. A prediction interval is added 
-# feel free to play around with colors or visuals, whatever you think looks best. 
-
-# basically I am going to generating predictions using sequences thats based off our fitted linear regression model. This will predict the survival probabilities at these ages. This is going to help create a smoother prediction interval. These predictions are based on our model, and I am not extrapolating beyond the scope of the analysis. This is basically to make our plot more beautiful. 
-
-# Generate predictions using data_clean
-age_seq <- seq(0, 100, by = 0.1)
-newdata <- data.frame(Age = age_seq)
-
-# Getting predictions and intervals
-predictions <- predict(model, newdata, interval = "prediction", level = 0.95)
-pred_df <- data.frame(
-  Age = age_seq,
-  fit = predictions[,"fit"],
-  lwr = predictions[,"lwr"],
-  upr = predictions[,"upr"]
-)
-
-# Now creating the plot! 
-combined = ggplot(data_clean, aes(x = Age, y = Survived_numeric)) +
- 
- 
-  geom_jitter(width = 0, height = 0.05, alpha = 0.3, color = "#4A90E2") +
-  
- 
-  geom_line(data = pred_df, aes(y = fit), color = "#E74C3C", size = 1) +
-  
- 
-  geom_ribbon(data = pred_df, aes(y = fit, ymin = lwr, ymax = upr), 
-              alpha = 0.2, fill = "#E74C3C") +
-  
-  
-  geom_vline(xintercept = c(18,65), linetype = "dashed", color = "#2ECC71", alpha = 0.75) +
-  
- 
+# Visualization: I am using jitter and other visual tricks to make this graph beautiful. 
+age_survival_boxplot = ggplot(data_clean, aes(x = Survived, y = Age, fill = Survived)) +
+  geom_boxplot(alpha = 0.7, outlier.shape = NA) +
+  geom_jitter(position = position_jitter(width = 0.2, height = 0), alpha = 0.3, color = "darkgrey") +
+  stat_summary(fun = mean, geom = "point", shape = 23, size = 3, fill = "white") +
+  scale_fill_manual(values = c("#FF6B6B", "#4ECDC4")) +
+  labs(
+    title = "Comparison of Ages: Survivors vs Non-Survivors on the Titanic",
+    x = "Survival Status",
+    y = "Age (Years)",
+    fill = "Survival Status"
+  ) +
   theme_minimal() +
-  labs(
-    title = "Titanic Survival Probability vs Age",
-    subtitle = "With Linear Regression and 95% Prediction Interval",
-    x = "Age (Years)",
-    y = "Probability of Survival",
-    caption = "Vertical lines: Age of adulthood (18 years) and retirement (65 years)"
-  ) +
-  
-  
-  scale_y_continuous(labels = percent) +
   theme(
-    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
-    plot.subtitle = element_text(hjust = 0.5, size = 12),
-    axis.title = element_text(size = 11),
-    plot.caption = element_text(hjust = 0, size = 10, color = "gray50")
-  )
-print(combined)
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    axis.title = element_text(size = 12),
+    legend.position = "none",
+    panel.grid.major = element_line(color = "grey95")
+  ) 
 
-data_clean$fitted_values = fitted(model)
-data_clean$residuals = resid(model)
+# Finally ready to print 
+print(age_survival_boxplot)
 
+# density visualization code 
+t_stat = 2.046
+df = 598.84
+p_value = 0.04119
+x = seq(-4,4, length.out = 1000) # I put a 1000 here because it makes the curve look smoother. 
+y = dt(x, df)
 
-residuals_df = data.frame(
-  Fitted = fitted(model),
-  Residuals = resid(model),
-  Age = data_clean$Age
-)
-residual_plot = ggplot(residuals_df, aes(x = Fitted, y = Residuals)) +
-  
+plot_data = data.frame(x = x, y = y)
 
-  geom_point(alpha = 0.4, color = "#3498DB") +
-  
-  
-  geom_hline(yintercept = 0, linetype = "dashed", color = "#E74C3C", size = 1) +
-  
-
-  geom_smooth(method = "loess", se = FALSE, color = "#2ECC71", size = 1) +
-  
-  
-  theme_minimal(base_size = 14) +
-  
-
+density_plot = ggplot(plot_data, aes(x = x, y = y)) + 
+  geom_line() + 
+  geom_vline(xintercept = t_stat, color = "red", linetype = "dashed") +
+  geom_area(data = subset(plot_data, x >= t_stat), aes(y = y), fill = "red", alpha = 0.3) + 
   labs(
-    title = "Residuals vs Fitted Values",
-    subtitle = "Assessing Homoscedasticity and Linearity Assumptions",
-    x = "Fitted Values (Predicted Survival Probability)",
-    y = "Residuals",
-    caption = "Data Source: Titanic Dataset"
-  ) +
-  
-  
-  scale_x_continuous(labels = percent_format(accuracy = 1)) +
-  scale_y_continuous(labels = NULL) +  
-  
-
+    title = "T-Distribution with Test Statistic and P-value",
+    x = "t-value",
+    y = "Density"
+  ) + 
+  theme_minimal() + 
   theme(
-    plot.title = element_text(face = "bold", hjust = 0.5, size = 16),
-    plot.subtitle = element_text(hjust = 0.5, size = 12, color = "gray40"),
-    axis.title = element_text(face = "bold"),
-    plot.caption = element_text(hjust = 0, size = 10, color = "gray50"),
-    panel.grid.major = element_line(color = "gray80"),
-    panel.grid.minor = element_blank()
+    plot.title = element_text(hjust = 0.5),
+    plot.caption = element_text(hjust = 1)
   )
-
-
-print(residual_plot)
 
 
 ```
+
+### Graphical Representation
 
 ```{r}
-print(combined)
-print(residual_plot)
+print(age_survival_boxplot)
 ```
+
+
+*Figure 1.* Two boxplots representing the distribution of ages of surviving (blue boxplot) and non-surviving (red boxplot) Titanic passengers. Grey dots represent individual passengers, and the white diamond represents the average age of a passenger in each category.
+
+```{r}
+print(density_plot)
+```
+
+
+*Figure 2.* T-distribution density graph. The red shaded area represents all possible age differences as extreme or more extreme than our calculated value.
 
 
 ## Discussion
+
 ### Further Interpretation
-As shown in the analysis presented, we have enough evidence to suggest that age plays a role in survivorship after the sinking of the Titanic. 
+Our analysis reveals that passengers who survived had an average age of about 28 years, compared to about 31 years for those who did not survive. 
+
+To put this in practical terms, younger passengers generally had better chances of surviving than older passengers. This finding supports historical accounts suggesting that younger passengers may have had advantages during evacuation, whether due to physical capabilities, prioritization in rescue efforts, or other factors.
+
 
 ### Short-Comings and Future Work
-Short-comings
-- Gender alongside social class played a role in who was prioritized
-- Some individual’s ages weren’t accounted for in the dataset which could lead to inaccuracies
+When developing future work using this dataset, a few shortcomings can be discussed. Although it can be refuted at times, many suggest that members of the Titanic allowed on the lifeboats were prioritized based on class and gender, with high-class women being at the top of the list.^[https://www.theguardian.com/science/2010/mar/02/titanic-lusitania-women-children-survival]  Some also suggest that children were prioritized in the lifeboats. Therefore, priority may be another variable that should have been accounted for; however, whether an individual was prioritized can only be determined by anecdotal evidence. Although our analysis could suggest that priority was present, it appears to have been given to younger individuals.
+
+There is a confounding variable in this study: the absence of ages for multiple individuals in the dataset. Although these individuals were excluded from the analysis, there is a possibility that the missing ages of those on the Titanic could skew our data and make our findings less accurate or even incorrect.
+
+Given these limitations, some of our shortcomings can be addressed in future work. Gender is one aspect fully accounted for in our data, so the question of whether it was "women and children first!" can be examined. If more aspects of the survivors could be determined, we could gain a deeper understanding of what made an individual more likely to survive the sinking of the Titanic.
 
 ### Conclusion
-The circumstances surrounding the survival of members of the Titanic sinking
+These findings suggest that younger passengers were slightly more likely to survive the Titanic disaster. However, it is important to recognize the limitations of this study, including the exclusion of other potentially influential factors and the handling of missing data. Future research incorporating additional variables and more sophisticated analytical methods could provide a deeper understanding of the factors that determined survival outcomes during this tragic event. 
+
+
 
 ## Resources
 
