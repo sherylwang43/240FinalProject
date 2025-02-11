@@ -1,0 +1,243 @@
+---
+title: "Final Project"
+output: html_document
+date: "December 11, 2024"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, 
+                      error = FALSE, 
+                      warning = FALSE, 
+                      message = FALSE)
+
+
+source("~/STAT240/scripts/ggprob.R")
+
+library(ggplot2)
+library(dplyr)
+library(tidyverse)
+library(scales)
+library(readr)
+library(ggthemes)
+
+data <- read_csv("~/STAT240/finalproject/finalProject/titanic.csv")
+
+```
+
+
+```{r, include=FALSE}
+
+# Here is my data prep!
+
+data_clean = data %>% 
+  select(Age, Survived) %>% 
+  filter(!is.na(Age)) %>%
+  mutate(Survived = factor(Survived, 
+                           levels = c(0, 1),
+                           labels = c("Did Not Survive", "Survived")))
+
+# Summary statistics with things like quartile and whatnot 
+summary_stats = data_clean %>%
+  group_by(Survived) %>%
+  summarise(
+    n = n(),
+    mean_age = mean(Age),
+    sd_age = sd(Age),
+    median_age = median(Age),
+    q1 = quantile(Age, 0.25),
+    q3 = quantile(Age, 0.75)
+  )
+
+print(summary_stats)
+
+# Two-Sample T-Test
+t_test_result = t.test(Age ~ Survived, data = data_clean, var.equal = FALSE) # var.equal = FALSE is what makes this a welch’s t-test, we are assuming that equal variance is violated. 
+print(t_test_result)
+
+# Visualization: I am using jitter and other visual tricks to make this graph beautiful. 
+age_survival_boxplot = ggplot(data_clean, aes(x = Survived, y = Age, fill = Survived)) +
+  geom_boxplot(alpha = 0.7, outlier.shape = NA) +
+  geom_jitter(position = position_jitter(width = 0.2, height = 0), alpha = 0.3, color = "darkgrey") +
+  stat_summary(fun = mean, geom = "point", shape = 23, size = 3, fill = "white") +
+  scale_fill_manual(values = c("#FF6B6B", "#4ECDC4")) +
+  labs(
+    title = "Comparison of Ages: Titanic Survivors vs Non-Survivors",
+    x = "Survival Status",
+    y = "Age (Years)",
+    fill = "Survival Status"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    axis.title = element_text(size = 12),
+    legend.position = "none",
+    panel.grid.major = element_line(color = "grey95")
+  ) 
+
+# Finally ready to print 
+print(age_survival_boxplot)
+
+# density visualization code 
+t_stat = 2.046
+df = 598.84
+p_value = 0.04119
+x = seq(-4,4, length.out = 1000) # I put a 1000 here because it makes the curve look smoother. 
+y = dt(x, df)
+
+plot_data = data.frame(x = x, y = y)
+
+density_plot = ggplot(plot_data, aes(x = x, y = y)) + 
+  geom_line() + 
+  geom_vline(xintercept = t_stat, color = "red", linetype = "dashed") +
+  geom_area(data = subset(plot_data, x >= t_stat), aes(y = y), fill = "red", alpha = 0.3) + 
+  labs(
+    title = "T-Distribution with Test Statistic and P-value",
+    x = "t-value",
+    y = "Density"
+  ) + 
+  theme_minimal() + 
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    plot.caption = element_text(hjust = 1)
+  )
+
+
+```
+
+*Authors: Luke Morrison, Camden Cobb, Cameron Marique, Sheryl Wang*
+
+## Introduction
+The sinking of the RMS Titanic stands as one of the most profound maritime tragedies in history, its narrative woven into the fabric of our culture's memory even after more than a century. The harrowing tales of its passengers-marked by courage, sacrifice, and the stark destiny of fate, continue to captivate and mystify. The circumstances surrounding who survived and who did not have sparked countless questions and theories. Were children given priority during the evacuation? Did certain age groups have a better chance of survival? 
+
+In this analysis, we aimed to answer the question: 
+
+**"What is the relationship between passenger age and survival probability on the Titanic?”**
+
+We used a dataset with historically accurate data about the RMS Titanic's 1912 voyage to gather information about the passengers' survival outcomes and demographic details. Our findings provided compelling evidence that age was indeed a critical factor associated with survival probability. 
+
+Specifically, our analysis found that the mean age of survivors was about two years younger than that of non-survivors. This age difference suggests that younger passengers had better odds of survival during this historic maritime disaster.  
+
+
+## Background
+
+In order to investigate whether these two variables are related, we utilized a Titanic dataset on github^[https://github.com/awesomedata/awesome-public-datasets/tree/master/Datasets]. The data in this set was compiled from historical passengers and official records of the RMS Titanic's maiden voyage in 1912. This was done by using official passenger manifests, Encyclopedia Titanica, survival records from the disaster, ticket purchasing records, and boarding documents to gather historically accurate data.
+
+A single row in the Titanic dataset represents one individual passenger aboard the Titanic’s maiden voyage. We had two variables of interest. 
+
+Our first variable of interest was a passenger’s age. This was a numerical variable measured by age in years, and our dataset did contain missing values for this variable. We excluded rows that had missing values. This variable was our independent variable.
+
+Our second variable of interest was whether a passenger survived or not. This was a binary, categorical variable with 0 representing a non-surviving passenger and 1 representing a surviving passenger. There were no missing values for this variable. This was our dependent variable. 
+
+In total, we had 177 missing values for age and no missing values for survival status. Before clearing missing values, our dataset had 891 passengers, with 342 surviving and 549 non-surviving. After clearing any passenger with a missing age value, we had 714 passengers, with 290 surviving and 424 non-surviving remaining in our dataset.
+
+To help visualize our findings, we created two boxplots - one representing the ages of those who survived, and one representing the age of those who did not. In this boxplot visualization, each gray dot represents an individual passenger, giving us a complete picture of every age in our dataset. The boxes show where most ages fall for each group - blue for survivors and red for non-survivors. The white diamond in each box marks the average age for that group. 
+
+Looking at the visualization, we can see that while the difference isn’t dramatic, the survivors’ box and collection of dots sits slightly lower than the non-survivors, showing the tendency for younger passengers to have survived more often. The white diamond representing the average passenger age is also slightly lower for the surviving boxplot.
+
+
+```{r}
+print(age_survival_boxplot)
+```
+
+<em> **Figure 1.** Two boxplots representing the distribution of ages of surviving (blue boxplot) and non-surviving (red boxplot) Titanic passengers. 
+
+Grey dots represent individual passengers, and the white diamond represents the average age of a passenger in each category. Comparing the two diamonds, it can be seen that the mean age of survivors is slightly lower.</em>
+
+## Analysis
+
+### Model Statement
+
+Let $X_i$, for $i = 1,\dots,n_1$ represent the ages of passengers who did not survive the Titanic disaster.
+
+Let $Y_i$ for $i = 1,\dots,n_2$ represent the ages of passengers who survived the Titanic disaster. 
+
+Let $\mu_x$ and $\sigma_x$ be the true mean and standard deviation of the age of the nonsurviving group $(D_x)$. 
+
+Let $\mu_y$ and $\sigma_y$ be the true mean and standard deviation of the age of the suriving group $(D_y)$. 
+
+We have:
+
+$X_i \sim D_x(\mu_x, \sigma_x)$
+
+$Y_i \sim D_y(\mu_y, \sigma_y)$
+
+### Assumptions
+We assume that the two samples are drawn independently from their respective populations. Additionally, while Welch’s t-test does not require equal variances, it assumes that each sample is drawn from a population that is approximately normally distributed. With large sample sizes, the test is robust to deviations from normality.
+
+We note that while survival status is binary, age is a continuous variable. Therefore, this analysis should not be modeled using BINS. 
+
+
+### Hypotheses
+
+**Null Hypothesis** ($H_0$): There is no difference in the mean ages of survivors and non-survivors, or:
+
+$H_0: \mu_x - \mu_y = 0$
+
+**Alternative Hypothesis** ($H_A$): There is a difference in the true mean ages of survivors and non-survivors, or:
+
+$H_A: \mu_x - \mu_y \neq 0$
+
+### Parameters of Interest 
+
+The parameter of interest is the difference in the true mean ages between the two groups: $\mu_x-\mu_y$.
+
+### Test Statistic and Null Distribution
+A two-sample Welch’s t-test is employed to compare the mean ages. The Welch’s t-test is appropriate here as it does not assume equal variances and remains valid under differing sample sizes and variances. The test statistic is:
+
+The test statistic is calculated as: 
+
+$$ t = \frac{(\bar{x} - \bar{y}) - (\mu_x - \mu_y)}{SE(\bar{x}-\bar{y})}$$
+
+Under the null hypothesis $H_0: \mu_x - \mu_y = 0$ the test statistic follows a t-distribution with degree of freedom approximated by Welch’s formula.
+
+### Results
+
+We conducted a two-sample Welch’s t-test to compare the mean ages between survivors and non-survivors
+
+
+**T-Test Results:**
+
+- **t-statistic:** 2.046
+- **Degrees of Freedom:** 598.84
+- **p-value:** 0.04119
+- **Sample Estimates:**
+
+  - Sample Mean (Did Not Survive): 30.626 years
+  - Sample Mean (Survived): 28.344 years
+  
+Here, our second visualization shows what statisticians call a t-distribution curve, which helps us understand how meaningful our age difference finding is. Think of it like the famous ‘bell curve’ where the red shaded area represents all possible age differences as extreme or more extreme than what we found in our data. This type of visualization helps us understand whether the age difference we observed could have happened by chance.
+</div>
+
+```{r}
+print(density_plot)
+```
+
+<em>
+**Figure 2:** A t-distribution curve with a vertical line at the observed test statistic (t=2.046), illustrating the area under the curve at or beyond this point corresponding to the p-value. 
+
+The shaded area shows the probability of observing this difference or a larger difference if there is no difference in the two means that the observed difference (survivors being roughly 2.3 years younger on average than non-survivors) is unlikely to be due to random chance alone.
+</em>
+
+
+## Discussion
+
+### Further Interpretation
+The results of the two-sample Welch’s t-test suggest a statistically significant difference in mean ages between Titanic survivors and non-survivors, with a p-value of approximately 0.04119. Interpreted in practical terms, if there were truly no difference in the population mean ages, we would expect to see a difference as large or larger than the one observed in only about 4.119% of studies of this nature—assuming all model conditions hold. 
+
+This relatively small p-value provides evidence that the observed difference (survivors being roughly 2.3 years younger on average than non-survivors) is unlikely to be due to random chance alone. This finding supports historical accounts suggesting that younger passengers may have had advantages during evacuation, whether due to physical capabilities, prioritization in rescue efforts, or other factors.
+
+
+### Short-Comings and Future Work
+When developing future work using this dataset, a few shortcomings can be discussed. Although it can be refuted at times, many suggest that members of the Titanic allowed on the lifeboats were prioritized based on class and gender, with high-class women being at the top of the list^[https://www.theguardian.com/science/2010/mar/02/titanic-lusitania-women-children-survival]. Some also suggest that children were prioritized in the lifeboats. Therefore, priority may be another variable that should have been accounted for; however, whether an individual was prioritized can only be determined by anecdotal evidence. Although our analysis could suggest that priority was present, it appears to have been given to younger individuals.
+
+There is a confounding variable in this study: the absence of ages for multiple individuals in the dataset. Although these individuals were excluded from the analysis, there is a possibility that the missing ages of those on the Titanic could skew our data and make our findings less accurate or even incorrect.
+
+Given these limitations, some of our shortcomings can be addressed in future work. Gender is one aspect fully accounted for in our data, so the question of whether it was "women and children first!" can be examined. If more aspects of the survivors could be determined, we could gain a deeper understanding of what made an individual more likely to survive the sinking of the Titanic.
+
+### Conclusion
+These findings suggest that younger passengers were slightly more likely to survive the Titanic disaster. However, it is important to recognize the limitations of this study, including the exclusion of other potentially influential factors and the handling of missing data. Future research incorporating additional variables and more sophisticated analytical methods could provide a deeper understanding of the factors that determined survival outcomes during this tragic event.
+
+
+
+## Resources
+
